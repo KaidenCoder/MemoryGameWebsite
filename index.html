@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Matching Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+  <link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Coda">
+  <style>
+    html {
+  box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: #ffffff url('../img/geometry2.png');
+  /* Background pattern from Subtle Patterns */
+  font-family: 'Acme', sans-serif;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+h1 {
+  font: 40px/1.5 'Acme', sans-serif;
+  font-weight: 500;
+  margin: 12px;
+}
+/*
+ * Styles for the deck of cards
+ */
+.deck {
+  width: 660px;
+  min-height: 680px;
+  background: linear-gradient(160deg, #56bcbf 0%, #047190 100%);
+  padding: 32px;
+  border-radius: 10px;
+  box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 3em;
+}
+.deck .card {
+  height: 125px;
+  width: 125px;
+  background: #2e3d49;
+  font-size: 0;
+  color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+  transition: all .3s ease-in-out;
+}
+.deck .card:hover {
+  transform: scale3d(1, 1, 2) rotateZ(0deg);
+  background: rgba(46, 61, 73, 0.815);
+}
+.deck .card.open {
+  transform: rotateY(0);
+  background: #02b3e4;
+  cursor: default;
+}
+.deck .card.show {
+  font-size: 33px;
+}
+.deck .card.match {
+  cursor: default;
+  background: #02ccba;
+  font-size: 33px;
+}
+/*
+ * Styles for the Score Panel
+ */
+.score-panel {
+  display: flex;
+  justify-content: space-between;
+  width: 500px;
+  margin-bottom: 10px;
+  font: 18px/1.5 'Acme', sans-serif;
+}
+.score-panel .stars {
+  margin: 0;
+  padding-right: 5px;
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+.score-panel .stars li {
+  list-style: none;
+  display: inline-block;
+}
+.score-panel .restart {
+  float: right;
+  cursor: pointer;
+}
+/* to change the color of the stars*/
+.grey {
+  color: #d3d3d3;
+}
+/* to stop event listener after opening two cards */
+.stop-event {
+  pointer-events: none;
+}
+/* popup */
+.popup {
+  position: fixed;
+  display: none;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(49, 49, 49, 0.7);
+  z-index: 1;
+}
+.popup-box {
+  position: fixed;
+  background-color: #fff;
+  top: 40%;
+  left: 25%;
+  width: 625px;
+  padding: 40px;
+  text-align: center;
+  border-radius: 5px;
+  box-shadow: 1px 1px 40px #e3e1e1;
+  list-style: none;
+}
+.popup-box h1 {
+  margin: auto;
+}
+.button-popup {
+  color: #f3f7f7;
+  background-color: #02b3e4;
+  width: 120px;
+  height: 30px;
+  border: 1px solid #e9edef;
+  border-radius: 5px;
+  box-shadow: 1px 2px 4px rgba(235, 235, 235, 0.48);
+  font-size: 1em;
+}
+.button-popup:hover {
+  background-color: #f3f7f7;
+  color: #02b3e4;
+  transition: all 0.5s ease;
+}
+.rating-popup li {
+  display: inline-block;
+}
+hr {
+  margin: 0 auto;
+  width: 80%;
+}
+/* Media Queries  */
+@media screen and (max-width: 650px) {
+  .score-panel {
+    width: 90%;
+    margin: 0 auto;
+    flex-basis: 40%;
+  }
+  .deck {
+    width: 95%;
+    padding: 3%;
+    margin: 0 auto;
+    min-height: 100%;
+  }
+  .deck .card {
+    height: 92px;
+    margin-top: 2%;
+  }
+  .popup-box {
+    width: 90%;
+    left: 5%;
+    top: 25%;
+    margin: auto 0;
+  }
+}
+@media screen and (max-width: 368px) {
+  .deck .card {
+    width: 68px;
+    height: 92px;
+    margin-top: 2%;
+  }
+}
+@media screen and (min-width: 369px) and (max-width: 460px) {
+  .deck .card {
+    width: 82px;
+  }
+}
+@media screen and (min-width: 461px) and (max-width: 516px) {
+  .deck .card {
+    width: 92px;
+  }
+}
+@media screen and (min-width: 517px) and (max-width: 580px) {
+  .deck .card {
+    width: 105px;
+  }
+}
+@media screen and (min-width: 651px) and (max-width: 820px) {
+  .popup-box {
+    width: 80%;
+    left: 10%;
+    top: 35%;
+    margin: auto 0;
+  }
+}
+@media screen and (min-width: 821px) and (max-width: 1024px) {
+  .popup-box {
+    width: 60%;
+    left: 20%;
+    top: 32%;
+  }
+}
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Matching Game</h1>
+    </header>
+
+    <section class="score-panel">
+      <ul class="stars">
+        <li><i class="fa fa-star"></i></li>
+        <li><i class="fa fa-star"></i></li>
+        <li><i class="fa fa-star"></i></li>
+      </ul>
+
+      <span class="moves">0 Moves</span>
+
+      <div class="timer">
+        <span class="hour"> 0 hrs</span> :
+        <span class="minute"> 0 mins</span> :
+        <span class="seconds"> 0 secs</span>
+      </div>
+
+      <div class="restart">
+        <i class="fa fa-repeat"></i>
+      </div>
+    </section>
+
+    <main id="cardboard">
+
+    </main>
+  </div>
+
+  <div class="popup">
+
+    <div class="popup-box">
+      <h1>Congratulations</h1>
+      <p>You finish it in:
+        <span class='time-popup'></span>
+        <br> Your star-rating is :
+        <span class='rating-popup'> </span>
+        <br> No. of moves:
+        <span class='moves-popup'> </span>
+      </p>
+      <button class="button-popup">Play Again</button>
+    </div>
+  </div>
+  <script type="text/javascript">
+  /*
+ * Create a list that holds all of your cards
+ */
+const card = ["fa fa-anchor", "fa fa-anchor",
+  "fa fa-bolt", "fa fa-bolt",
+  "fa fa-bomb", "fa fa-bomb",
+  "fa fa-bicycle", "fa fa-bicycle",
+  "fa fa-cube", "fa fa-cube",
+  "fa fa-diamond", "fa fa-diamond",
+  "fa fa-leaf", "fa fa-leaf",
+  "fa fa-paper-plane-o", "fa fa-paper-plane-o"
+];
+////////////////////////////////////////////////////////////////////////
+// Shuffle function from http://stackoverflow.com/a/2450976//
+/////////////////////////////////////////////////////////////////////
+function shuffle(array) {
+  var currentIndex = array.length,
+    temporaryValue, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
+}
+const cardboard = document.querySelector('#cardboard');
+let checkCards = [];
+let matchedCards = [];
+let timerOn = false;
+// CREATE CARDS OF DECK AND SHUFFLE
+createCardDeck();
+function createCardDeck() {
+  const cardDeck = document.createElement('ol');
+  cardDeck.classList.add('deck');
+  // CREATING DECK AND SHUFFLING CARDS
+  let shuffleCard = shuffle(card);
+  for (let i = 0; i < shuffleCard.length; i++) {
+    const newList = document.createElement('li');
+    newList.classList.add('card');
+    let shuffled = `<i class="${shuffleCard[i]}"></i>`;
+    newList.innerHTML = shuffled;
+    cardDeck.appendChild(newList);
+  }
+  cardboard.appendChild(cardDeck);
+  cardboard.addEventListener('click', respondToClick);
+}
+// ON RESPONSE TO USER CLICK ON THE CARD, IT OPENS
+function respondToClick(e) {
+  let clickedCard = e.target;
+  if (clickedCard.classList.contains("card") &&
+    !clickedCard.classList.contains("open", "show", "match")) {
+    if (timerOn === false) {
+      startTimer();
+      timerOn = true;
+    }
+    clickedCard.classList.add("open", "show");
+    checkCards.push(clickedCard);
+  }
+  // IF CARD MATCHES, IT PROCEEDS TO CHECK OTHER CARDS
+  if (checkCards.length === 2) {
+    cardboard.classList.add("stop-event");
+    movesNum();
+    if (checkCards[0].innerHTML === checkCards[1].innerHTML) {
+      matched();
+    } else {
+      // IF CARD DOES NOT MATCH, IT RETURNS BACK TO ITS ORIGINAL FORM
+      notMatched();
+    }
+    gameComplete();
+  }
+}
+//MACTHING CARDS FUNCTION
+function matched() {
+  checkCards[0].classList.add("match");
+  checkCards[1].classList.add("match");
+  matchedCards.push(checkCards[0]);
+  matchedCards.push(checkCards[1]);
+  checkCards = [];
+  cardboard.classList.remove("stop-event");
+}
+// IF CARDS DOES NOT MATCH, THEN THIS IS THE FUNCTION
+function notMatched() {
+  setTimeout(function() {
+    checkCards[0].classList.remove("open", "show");
+    checkCards[1].classList.remove("open", "show");
+    checkCards = [];
+    cardboard.classList.remove("stop-event");
+  }, 1000);
+}
+// COUNTING THE NUMBER OF MOVES PER 2 CLICKS ON 2 CARDS
+let moves = 0;
+const counter = document.querySelector(".moves");
+function movesNum() {
+  moves++;
+  counter.innerHTML = `${moves} Moves`;
+  rating();
+}
+// RATING CALCULATED BASED ON THE TOTAL NUMBER OF MOVES
+const stars = document.querySelector('.stars').childNodes;
+let rateStep = 6;
+const exactMoves = card.length / 2;
+const maxStars = exactMoves + rateStep;
+const minStars = exactMoves + (2 * rateStep);
+function rating() {
+  if (moves === maxStars) {
+    stars[5].classList.add('grey');
+  } else if (moves === minStars) {
+    stars[3].classList.add('grey');
+  }
+}
+// CALCULATING TIME ON SECONDS, MINUTES & HOURS
+let seconds = 0;
+let minutes = 0;
+let hours = 0;
+const timer = document.querySelector(".timer");
+const hourTimer = document.querySelector(".hour");
+const minuteTimer = document.querySelector(".minute");
+const secondsTimer = document.querySelector(".seconds");
+let totalTime = 0;
+let timeCounter;
+function startTimer() {
+  timeCounter = setInterval(function() {
+    totalTime += 1;
+    hours = Math.floor(totalTime / 60 / 60);
+    minutes = Math.floor((totalTime / 60) % 60);
+    seconds = totalTime % 60;
+    hourTimer.innerHTML = `${hours} hrs`;
+    minuteTimer.innerHTML = ` ${minutes} mins`;
+    secondsTimer.innerHTML = ` ${seconds} secs`;
+  }, 1000);
+}
+// RESTART THE GAME WHENEVER YOU WANT
+const restart = document.querySelector(".restart");
+function initial() {
+  timerOn = false;
+  moves = 0;
+  counter.innerHTML = `0 Moves`;
+  matchedCards = [];
+  checkCards = [];
+  seconds = 0;
+  minutes = 0;
+  hours = 0;
+  secondsTimer.innerText = "0 secs";
+  minuteTimer.innerText = " 0 mins";
+  hourTimer.innerText = "0 secs";
+}
+function restartGame() {
+  initial();
+  cardboard.innerHTML = "";
+  createCardDeck();
+  clearInterval(timeCounter);
+  stars[5].classList.remove('grey');
+  stars[3].classList.remove('grey');
+}
+restart.addEventListener("click", restartGame);
+//WHEN THE GAME IS COMPLETE, RESULT SUMMARY IS DISPLAYED
+const popup = document.querySelector('.popup');
+const timepopup = document.querySelector('.time-popup');
+const ratingpopup = document.querySelector('.rating-popup');
+const movespopup = document.querySelector('.moves-popup');
+const buttonpopup = document.querySelector('.button-popup');
+const starsForRate = document.querySelector('.stars');
+function gameComplete() {
+  if (matchedCards.length === 16) {
+    timepopup.innerText = timer.innerText;
+    ratingpopup.innerHTML = starsForRate.innerHTML;
+    movespopup.innerHTML = counter.innerHTML.slice(0, 3);
+    clearInterval(timeCounter);
+    popup.style.display = 'block';
+  }
+}
+buttonpopup.addEventListener('click', function() {
+  popup.style.display = 'none';
+  restartGame();
+  timerOn = false;
+})
+////////////////////////////////////////////////////
+/*
+ * Display the cards on the page
+ *   - shuffle the list of cards using the provided "shuffle" method below
+ *   - loop through each card and create its HTML
+ *   - add each card's HTML to the page
+ */
+/*
+ * set up the event listener for a card. If a card is clicked:
+ *  - display the card's symbol (put this functionality in another function that you call from this one)
+ *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
+ *  - if the list already has another card, check to see if the two cards match
+ *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
+ *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
+ *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
+ *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
+ */
+  </script>
+</body>
+
+</html>
